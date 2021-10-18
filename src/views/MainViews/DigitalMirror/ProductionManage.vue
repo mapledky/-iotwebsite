@@ -84,7 +84,7 @@
 				height: document.documentElement.clientHeight,
 				// userID: 'user_2',
 				// token: '1628765771204',
-				companyID: '1',
+				companyID: '',
 				userType: null,
 				cards: [],
 				Componies: [],
@@ -100,27 +100,28 @@
 			console.log(this.userType)
 			var that = this
 			if (this.userType !== '3') {
+				this.companyID = Cookies.get('company_id')
 				console.log("普通")
-				this.$axios.get('https://site.maple.today/IOTplatform/ServerMain', {
-						params: {
-							requestCode: '005',
-							user_id: Cookies.get('user_id'),
-							company_id: Cookies.get('company_id'),
-							token: Cookies.get('token')
-						}
-					})
-					.then(function(response) {
-						console.log(Cookies.get('user_id'))
-						console.log(Cookies.get('company_id'))
-						console.log(Cookies.get('token'))
-						// console.log("get success in type 1")
-						console.log(response)
-						that.cards = response.data.data
-
-					})
-					.catch(function(error) {
-						console.log(error)
-					})
+				// this.$axios.get('https://site.maple.today/IOTplatform/ServerMain', {
+				// 		params: {
+				// 			requestCode: '005',
+				// 			user_id: Cookies.get('user_id'),
+				// 			company_id: Cookies.get('company_id'),
+				// 			token: Cookies.get('token')
+				// 		}
+				// 	})
+				// 	.then(function(response) {
+				// 		console.log(Cookies.get('user_id'))
+				// 		console.log(Cookies.get('company_id'))
+				// 		console.log(Cookies.get('token'))
+				// 		// console.log("get success in type 1")
+				// 		console.log(response)
+				// 		that.cards = response.data.data
+						
+				// 	})
+				// 	.catch(function(error) {
+				// 		console.log(error)
+				// 	})
 			} else {
 				console.log("系统管理员")
 				// alert("系统管理员")

@@ -81,22 +81,22 @@
 			
 			if (this.userType !== '3') {
 				this.companyID = Cookies.get('company_id')
-				this.$axios.get('https://site.maple.today/IOTplatform/ServerMain', {
-						params: {
-							requestCode: '007',
-							user_id: Cookies.get('user_id'),
-							company_id: Cookies.get('company_id'),
-							token: Cookies.get('token')
-						}
-					})
-					.then(function(response) {
-						console.log(response.data.data)
-						that.cards = response.data.data
-						// console.log(that.Componies)
-					})
-					.catch(function(error) {
-						console.log(error)
-					})
+				// this.$axios.get('https://site.maple.today/IOTplatform/ServerMain', {
+				// 		params: {
+				// 			requestCode: '007',
+				// 			user_id: Cookies.get('user_id'),
+				// 			company_id: Cookies.get('company_id'),
+				// 			token: Cookies.get('token')
+				// 		}
+				// 	})
+				// 	.then(function(response) {
+				// 		// console.log(response.data.data)
+				// 		that.cards = response.data.data
+				// 		// console.log(that.Componies)
+				// 	})
+				// 	.catch(function(error) {
+				// 		console.log(error)
+				// 	})
 			} else {
 				this.companyID = null
 				this.$axios.get('https://site.maple.today/IOTplatform/ServerMain', {
