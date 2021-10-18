@@ -318,7 +318,7 @@
 				// TCP/TLS 连接字符串，仅限 Node.js 环境
 				const TCP_URL = 'wss://mqtt.maple.today:8084/mqtt'
 				this.client = mqtt.connect(TCP_URL, options)
-				var url = 'update' + '/' + company_id + '/device_' + that.device.sensor_id
+				var url = 'update' + '/' + company_id + '/#'
 				this.client.on('connect', () => {
 					// eslint-disable-next-line no-console
 					console.log('连接成功')
@@ -342,22 +342,24 @@
 					//var requestId = topic.slice('update/1/1'.length)
 					var messageData = JSON.parse(payload.toString())
 					// eslint-disable-next-line no-console
-					console.log('messageData:', messageData)
-					var data = {
-						data: [],
-						data_format: [],
-						sensor_id: '',
-						time: '',
-						device_id: '',
-						company_id: ''
-					}
-					data.company_id = messageData.company_id
-					data.sensor_id = messageData.sensor_id
-					data.device_id = messageData.device_id
-					data.data = messageData.data_upload
-					data.data_format = that.device.data_format
-					data.time = that.getYMDHMS(parseInt(messageData.timestamp))
-					that.msg = data
+
+					if (that.device.sensor_id==messageData.sensor_id){
+						var data = {
+								data: [],
+								data_format: [],
+								sensor_id: '',
+								time: '',
+								device_id: '',
+								company_id: ''
+							}
+						data.company_id = messageData.company_id
+						data.sensor_id = messageData.sensor_id
+						data.device_id = messageData.device_id
+						data.data = messageData.data_upload
+						data.data_format = that.device.data_format
+						data.time = that.getYMDHMS(parseInt(messageData.timestamp))
+						that.msg = data
+					}	
 				})
 			},
 

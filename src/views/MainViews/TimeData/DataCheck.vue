@@ -208,7 +208,7 @@
 				"requestCode": "005",
 				"user_id": user_id,
 				"token": token,
-				"company_id": 1,
+				"company_id": company_id,
 			}
 			// console.log(Qs.stringify(ProductionsData));
 			var AXIOS = axios.create({
@@ -227,7 +227,7 @@
 							"requestCode": "025",
 							"user_id": user_id,
 							"token": token,
-							"company_id": 1,
+							"company_id": company_id,
 							"product_id": _this.ProductionsInfor[i].product_id,
 						}
 						// console.log(Qs.stringify(DeviceData));
@@ -243,7 +243,7 @@
 										"requestCode": "027",
 										"user_id": user_id,
 										"token": token,
-										"company_id": 1,
+										"company_id": company_id,
 										"device_id": _this.DeviceInfor[j].sensor_id
 									};
 									// console.log(Qs.stringify(postdata))
