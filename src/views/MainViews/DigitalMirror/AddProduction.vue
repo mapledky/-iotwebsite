@@ -42,12 +42,13 @@
 							<el-form-item label="产品属性">
 								<div class="table">
 									<el-table :data="this.tableData" style="width: 100%" max-height="250">
+										<el-table-column prop="type" label="数据类型" width="120">
+										</el-table-column>
 										<el-table-column prop="name" label="属性名称" width="150">
 										</el-table-column>
 										<!-- <el-table-column prop="showName" label="显示名称" width="120">
 										</el-table-column> -->
-										<!-- <el-table-column prop="type" label="数据类型" width="120">
-										</el-table-column> -->
+										
 										<el-table-column prop="default" label="默认值" width="120">
 										</el-table-column>
 										<el-table-column prop="unit" label="单位" width="300">
@@ -66,6 +67,15 @@
 
 							</el-form-item>
 							<el-form-item label="添加属性" v-if="addMode" style="width: 50%; z-index: 999;">
+								 <el-select v-model="addTable.type" placeholder="请选择数据类型">
+								    <el-option
+								      v-for="item in options"
+								      :key="item.value"
+								      :label="item.label"
+								      :value="item.value">
+								    </el-option>
+								  </el-select>
+								
 								<el-input placeholder="属性名称" v-model="addTable.name"></el-input>
 								<!-- <el-input placeholder="仪器型号" v-model="addTable.showName"></el-input>
 								<el-input placeholder="数据类型" v-model="addTable.type"></el-input> -->
@@ -92,15 +102,28 @@
 <script lang="ts">
 	import Cookies from 'js-cookie'
 	type tableDataType = {
-		name: string,
-		showName: string,
 		type: string,
+		name: string,
+		// showName: string,
 		default: string,
 		unit: string,
 	}
 	export default {
 		data() {
 			return {
+				options: [{
+				         value: '运行数据',
+				         label: '运行数据'
+				       }, {
+				         value: '设备参数',
+				         label: '设备参数'
+				       }, {
+				         value: '刀具坐标',
+				         label: '刀具坐标'
+				       }, {
+				         value: '运行文本',
+				         label: '运行文本'
+				       }],
 				isSelectFile: false,
 				imgUrl: [],
 				imgData: [],
@@ -120,9 +143,10 @@
 
 				],
 				addTable: {
+					type: '',
 					name: '',
 					// showName: '',
-					// type: '',
+					
 					default: '',
 					unit: ''
 				}
@@ -209,14 +233,14 @@
 
 					if (update) {
 						let updata: tableDataType = {
-							name: '',
-							showName: '',
 							type: '',
+							name: '',
+							// showName: '',
 							default: '',
 							unit: ''
 						}
 						// let updata :tableData = this.addTable
-						updata.showName = this.addTable.showName
+						// updata.showName = this.addTable.showName
 						updata.name = this.addTable.name
 						updata.type = this.addTable.type
 						updata.unit = this.addTable.unit
@@ -224,7 +248,7 @@
 						this.tableData.push(updata)
 						console.log(updata)
 						this.addTable.name = ''
-						this.addTable.showName = ''
+						// this.addTable.showName = ''
 						this.addTable.type = ''
 						this.addTable.default = ''
 						this.addTable.unit = ''

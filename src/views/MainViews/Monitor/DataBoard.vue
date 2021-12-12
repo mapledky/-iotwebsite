@@ -1,18 +1,18 @@
 <template>
 	<div>
-		<el-breadcrumb separator-class="el-icon-arrow-right" style="height: 4%">
+		<el-breadcrumb separator-class="el-icon-arrow-right" style="height: 4%;display: flex">
 			<el-breadcrumb-item>首页</el-breadcrumb-item>
 			<el-breadcrumb-item>监控运维</el-breadcrumb-item>
 			<el-breadcrumb-item>仪表盘</el-breadcrumb-item>
 			<span style="display: flex;flex-direction: row;">
-				<div style="font-weight: 700; color: #000000; display: flex; flex-direction: row;" @click="goBack"> 设备列表
-				</div>
+				<div style="font-weight: 700; color: #000000; display: flex; flex-direction: row;" @click="goBack"> 设备列表</div>
 				<!-- 设备列表 -->
 				<i class="el-icon-arrow-right" style="color: #9fa0a3;"></i>
 			</span>
 			<el-breadcrumb-item>数据查看</el-breadcrumb-item>
 		</el-breadcrumb>
 		<div class="workspace">
+			<el-scrollbar style="height: 100%; width: 100%">
 			<div class="title-bar">
 				<div v-if="device">{{ device.sensor_name }}</div>
 				<div style="display: flex">
@@ -31,8 +31,32 @@
 				</div>
 			</div>
 			<div class="scrollbox">
-				<el-scrollbar style="height: 100%; width: 100%">
 					<div class="data-board">
+						<div class="location-box" v-if="isshow1">
+							<div v-for="data in location" :key="data.title" style="display: flex;">
+								<div class="data-title">{{ data.title }}:</div>
+								<div class="data-content">{{ data.content }}</div>
+							</div>
+						</div>
+						<div class="deviceparameters-box" v-if="isshow2"> 
+							<div v-for="data in parameters" :key="data.title" style="display: flex;">
+								<div class="data-title">{{ data.title }}:</div>
+							    <div class="data-content">{{ data.content }}</div>
+							</div>
+						</div>
+						
+						<div class="context-box" v-if="isshow3">
+							<el-scrollbar style="height: 100%; width: 100%">
+								<div style="display: flex; flex-direction: column;">
+									<div v-for="(data,index) in contents" :key="index" style="display: flex;height: 30px;line-height: 30px;">
+										<div class="data-title">{{ data.title }}:</div>
+										<div class="data-content">{{ data.content }}</div>
+									</div>
+								</div>
+							</el-scrollbar>
+							
+						</div>
+						
 						<div class="chartbox">
 							<div class="chart-container">
 								<div id="linechart1"
@@ -42,7 +66,7 @@
 									style="width: 49%; height: 400px; border: 1px solid #aaaaaa; border-radius: 5px">
 								</div>
 							</div>
-							<div style="border: 1px solid #aaaaaa; color: black; border-radius: 5px; height: 300px">
+							<div style="border: 1px solid #aaaaaa; color: black; border-radius: 5px; height: 300px; margin-top: 10px">
 								<el-table :data="chartData.slice((currentPage - 1) * pagesize, currentPage * pagesize)"
 									height="250" style="width: 100%">
 									<el-table-column label="Time" prop="name"></el-table-column>
@@ -56,10 +80,11 @@
 								</div>
 							</div>
 						</div>
-					</div>
-				</el-scrollbar>
+					</div>	
 			</div>
+			</el-scrollbar>
 		</div>
+		
 	</div>
 </template>
 
@@ -94,6 +119,12 @@
 				currentPage: 1,
 				pagesize: 10,
 				length: '',
+				location: [],
+				parameters: [],
+				contents: [],
+				isshow1: false,
+				isshow2: false,
+				isshow3: false,
 			}
 		},
 		created() {
@@ -103,7 +134,6 @@
 			this.getCookieData()
 			this.fetchDeviceData()
 			this.getMqtt()
-			//this.length = this.sliceDataArray('2021-08-28').length
 		},
 		watch: {
 			msg: {
@@ -111,23 +141,102 @@
 				handler(newval) {
 					const that = this
 					that.fetchdata.push(newval)
+					
+					var newdata = newval
+					
 					//数据处理
 					for (var j = 0; j < that.fetchdata.length; j++) {
 						delete that.fetchdata[j].company_id
 						delete that.fetchdata[j].sensor_id
 						delete that.fetchdata[j].device_id
 					}
+					
+					var location = []
+					for(var z = 0; z < newdata.data_format.length ; z++){
+						if(newdata.data_format[z].type === '刀具坐标'){
+							var y = {
+								title: '',
+								content: '',
+							}
+							y.title = newdata.data_format[z].name
+							y.content = newdata.data[z]
+							location.push(y)
+						}else{
+					
+						}
+					}
+					that.location = location
+					if(that.location.length>0)
+					{
+						that.isshow1 = true
+					}else{
+						that.isshow1 = false
+					}
+					
+					var parameters = []
+					for(var p = 0; p < newdata.data_format.length ; p++){
+						if(newdata.data_format[p].type === '设备参数'){
+						
+							var y = {
+								title: '',
+								content: '',
+							}
+							y.title = newdata.data_format[p].name
+							y.content = newdata.data[p]
+							parameters.push(y)
+						}else{
+							
+						}
+					}
+					that.parameters = parameters
+					if(that.parameters.length>0)
+					{
+						that.isshow2 = true
+					}else{
+						that.isshow2 = false
+					}
+					
+					for(var q = 0; q < newdata.data_format.length; q++){
+						if(newdata.data_format[q].type === '运行文本')
+						{
+							var y = {
+								title: '',
+								content: '',
+							}
+							y.title = newdata.data_format[q].name
+							y.content = newdata.data[q];
+							that.contents.push(y);
+						}
+					}
+					if(that.contents.length>0)
+					{
+						that.isshow3 = true
+					}else{
+						that.isshow3 = false
+					}
+			
 
 					var date = that.getBeforeDate(0)
 					if (that.value === date) {
 						var chartData = that.sliceDataArray(date)
-						var type = chartData[0].data_format[0].name
+						// var type
+						// var count
+						// for(var x = 0; x < chartData[0].data_format.length; x++){
+						// 	if(chartData[0].data_format[x].type === '运行数据')
+						// 	{
+						// 		type = chartData[0].data_format[x].name
+						// 		count = x
+						// 		break
+						// 	}
+						// }
+						
 						var count
 						for (var k = 0; k < chartData[0].data_format.length; k++) {
-							if (chartData[0].data_format[k].name === type) {
+							if (chartData[0].data_format[k].name === that.val && chartData[0].data_format[k].type === '运行数据') {
 								count = k
 							}
 						}
+						
 						var chartdata1 = []
 						for (var h = 0; h < chartData.length; h++) {
 							var b = {
@@ -211,7 +320,7 @@
 				var new_device = decodeURIComponent(that.$route.query.device)
 				that.device = JSON.parse(new_device)
 				// eslint-disable-next-line no-console
-				console.log(that.device)
+				//console.log(that.device)
 			},
 
 			//获取时间选择器
@@ -247,7 +356,7 @@
 				}
 				that.value = that.dateOptions[0].value
 				// eslint-disable-next-line no-console
-				console.log(that.dateOptions)
+				//console.log(that.dateOptions)
 			},
 
 			//获取数据类型选择器
@@ -256,14 +365,18 @@
 				var new_device = decodeURIComponent(that.$route.query.device)
 				var device1 = JSON.parse(new_device)
 				for (var i = 0; i < device1.data_format.length; i++) {
-					var a = {}
-					a.value = device1.data_format[i].name
-					a.label = device1.data_format[i].name
-					that.datatype[i] = a
+					if(device1.data_format[i].type === '运行数据')
+					{
+					  var a = {}
+					  a.value = device1.data_format[i].name
+					  a.label = device1.data_format[i].name
+					  that.datatype[i] = a
+					}
+		
 				}
 				that.val = that.datatype[0].value
 				// eslint-disable-next-line no-console
-				console.log(that.datatype)
+				//console.log(that.datatype)
 			},
 
 			//时间转换
@@ -359,7 +472,8 @@
 						data.data_format = that.device.data_format
 						data.time = that.getYMDHMS(parseInt(messageData.timestamp))
 						that.msg = data
-					}	
+					}
+					console.log(that.msg)	
 				})
 			},
 
@@ -382,7 +496,7 @@
 					})
 					.then(function(response) {
 						// eslint-disable-next-line no-console
-						console.log(response.data)
+						console.log(response.data.data)
 						for (var i = 0; i < response.data.data.length; i++) {
 							var fetchdata1 = response.data.data[i].data.replace('[', '')
 							var fetchdata2 = fetchdata1.replace(']', '')
@@ -390,7 +504,9 @@
 							response.data.data[i].data = fetchdata3.split(',')
 							response.data.data[i].data_format = that.device.data_format
 						}
+						
 						that.fetchdata = response.data.data
+						console.log(that.fetchdata)
 
 						//数据处理
 						for (var j = 0; j < that.fetchdata.length; j++) {
@@ -398,16 +514,29 @@
 							delete that.fetchdata[j].sensor_id
 							delete that.fetchdata[j].device_id
 						}
-
+                        //初始截取动态数据
 						var date = that.getBeforeDate(0)
+						console.log(date)
 						var chartData = that.sliceDataArray(date)
-						var type = chartData[0].data_format[0].name
+						console.log(chartData)
+						var type
 						var count
-						for (var k = 0; k < chartData[0].data_format.length; k++) {
-							if (chartData[0].data_format[k].name === type) {
-								count = k
+						for(var x = 0; x < chartData[0].data_format.length; x++){
+							if(chartData[0].data_format[x].type === '运行数据')
+							{
+								type = chartData[0].data_format[x].name
+								count = x
+								break
 							}
 						}
+						console.log(count)
+						// var type = chartData[0].data_format[0].name
+						// var count
+						// for (var k = 0; k < chartData[0].data_format.length; k++) {
+						// 	if (chartData[0].data_format[k].name === type) {
+						// 		count = k
+						// 	}
+						// }
 						var chartdata1 = []
 						for (var h = 0; h < chartData.length; h++) {
 							var b = {
@@ -422,7 +551,8 @@
 						that.chartData = chartdata1.sort(function(a, b) {
 							return a.name > b.name ? 1 : -1
 						})
-
+                        console.log(that.chartData)
+						
 						var chartdata3 = []
 						var a = 0
 						var max = that.chartData[0].value[1]
@@ -478,7 +608,7 @@
 
 				var count
 				for (var k = 0; k < chartData[0].data_format.length; k++) {
-					if (chartData[0].data_format[k].name === that.val) {
+					if (chartData[0].data_format[k].name === that.val && chartData[0].data_format[k].type === '运行数据') {
 						count = k
 					}
 				}
@@ -532,7 +662,7 @@
 				var type = val
 				var count
 				for (var k = 0; k < chartData[0].data_format.length; k++) {
-					if (chartData[0].data_format[k].name === type) {
+					if (chartData[0].data_format[k].name === type && chartData[0].data_format[k].type === '运行数据') {
 						count = k
 					}
 				}
@@ -723,11 +853,13 @@
 	.scrollbox {
 		height: 100%;
 		width: 100%;
+		margin-top: 80px;
 	}
 
 	.data-board {
 		margin-top: 15px;
-		height: 800px;
+		padding-top: 10px;
+		min-height: 1000px;
 		width: 98%;
 		margin-left: 1%;
 		margin-right: 1%;
@@ -743,6 +875,7 @@
 
 	.title-bar {
 		height: 60px;
+		width: 100%;
 		line-height: 60px;
 		background: white;
 		padding-left: 1%;
@@ -750,6 +883,9 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
+		position: absolute;
+		top: 0;
+		z-index: 999999;
 	}
 
 	.titleBox {
@@ -785,22 +921,72 @@
 
 	.chartbox {
 		width: 98%;
-		margin-top: 10px;
+		margin-top: 5px;
 		margin-left: 1%;
 		margin-right: 1%;
 		background: white;
 		height: 700px;
 	}
-
+	
+	.location-box {
+		height: 30px;
+		line-height: 30px;
+		width: 98%;
+		margin-left: 1%;
+		margin-right: 1%;
+		border: 1px solid #aaaaaa;
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.deviceparameters-box{
+		margin-top: 10px;
+		height: 30px;
+		line-height: 30px;
+		width: 98%;
+		margin-left: 1%;
+		margin-right: 1%;
+		border: 1px solid #aaaaaa;
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.context-box{
+		margin-top: 10px;
+		height: 150px;
+		line-height: 30px;
+		width: 98%;
+		margin-left: 1%;
+		margin-right: 1%;
+		border: 1px solid #aaaaaa;
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.data-title{
+		font-size: 15px;
+		font-weight: bold;
+		margin-left: 1%;
+	}
+	
+	.data-content{
+		font-size: 18px;
+		margin-left: 10px;
+	}
+	
 	.chart-container {
 		height: 410px;
 		padding-top: 10px;
+		margin-top: 10px;
 		width: 100%;
 		display: flex;
 		flex-direction: row;
 		justify-content: space-around;
 	}
-
+	
 	.el-scrollbar .el-scrollbar__wrap {
 		overflow-x: hidden;
 	}

@@ -268,7 +268,7 @@
 
 	.plusButton {
 		position: fixed;
-		top: 20%;
+		top: 110px;
 		right: 30px;
 	}
 

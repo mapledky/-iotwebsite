@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-breadcrumb separator-class="el-icon-arrow-right" style="height: 4%">
+    <el-breadcrumb separator-class="el-icon-arrow-right" style="height: 4%;">
       <el-breadcrumb-item>首页</el-breadcrumb-item>
       <el-breadcrumb-item>监控运维</el-breadcrumb-item>
       <el-breadcrumb-item>仪表盘</el-breadcrumb-item>
@@ -68,7 +68,7 @@ export default {
       company_id: '',
       productListData: [],
       currentPage: 1,
-      pagesize: 4,
+      pagesize: 12,
     }
   },
 

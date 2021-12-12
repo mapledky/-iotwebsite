@@ -49,10 +49,11 @@
 								<el-collapse-item title="仪器指标" name="2">
 									<template>
 										<el-table :data="item.data_format" style="width: 100%">
-											<el-table-column prop="name" label="名称" width="180">
+											<el-table-column prop="type" label="数据类型" width="180">
 											</el-table-column>
-											<!-- <el-table-column prop="showName" label="型号" width="180">
-											</el-table-column> -->
+											<el-table-column prop="name" label="名称" width="90">
+											</el-table-column>
+											
 											<el-table-column prop="default" label="默认值">
 											</el-table-column>
 											<el-table-column prop="unit" label="单位">
@@ -89,9 +90,6 @@
 				cards: [],
 				Componies: [],
 			}
-		},
-		beforeCreate() {
-
 		},
 		created() {
 			// console(this.userID +" "+ this.token + " "+this.company_id)
@@ -211,8 +209,22 @@
 							var data = response.data.data
 							for (var number in data) {
 								if (data[number].dismiss === "1") {
+									// for(var num in data[number].data_format){
+									// 	if(data[number].data_format[num].type ==="device_data"){
+									// 		data[number].data_format[num].type =  "运行数据类"
+									// 	}
+									// 	else if(data[number].data_format[num].type ==="device_param"){
+									// 		data[number].data_format[num].type =  "设备参数类"
+									// 	} else if(data[number].data_format[num].type ==="device_con_location"){
+									// 		data[number].data_format[num].type =  "刀具坐标类"
+									// 	} else if(data[number].data_format[num].type ==="device_run_text"){
+									// 		data[number].data_format[num].type =  "文本类"
+									// 	}
+										
+									// }
 									that.cards.push(data[number])
 								}
+								
 							}
 							console.log(that.cards)
 						})
@@ -249,7 +261,7 @@
 
 	.plusButton {
 		position: fixed;
-		top: 20%;
+		top: 110px;
 		right: 30px;
 	}
 
